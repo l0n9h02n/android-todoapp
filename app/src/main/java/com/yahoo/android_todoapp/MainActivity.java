@@ -36,8 +36,8 @@ public class MainActivity extends Activity {
         // items = new ArrayList<String>();
         itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
         lvItems.setAdapter(itemsAdapter);
-        items.add("First Item");
-        items.add("Second Item");
+        // items.add("First Item");
+        // items.add("Second Item");
 
         // listen long click event and remove item
         setupListViewListener();
@@ -128,6 +128,8 @@ public class MainActivity extends Activity {
             if (editedText != null && editedText.length() > 0 && !editedText.equals(editingItem)) {
                 items.set(position, editedText);
                 itemsAdapter.notifyDataSetChanged();
+
+                writeItems();
             }
         }
     }
