@@ -1,6 +1,7 @@
 package com.yahoo.android_todoapp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,9 +19,11 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
-    ListView lvItems;
+    private final int REQUEST_CODE = 20;
+    private ArrayList<String> items;
+    private ArrayAdapter<String> itemsAdapter;
+    private ListView lvItems;
+    private String editingItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,18 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+
+        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
+                editingItem = items.get(position);
+                intent.putExtra("editing_item", editingItem);
+                intent.putExtra("position", position);
+
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
     }
 
     private void readItems() {
@@ -102,6 +117,18 @@ public class MainActivity extends Activity {
             FileUtils.writeLines(todoFile, items);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            String editedText = intent.getExtras().getString("editing_item");
+            int position = intent.getIntExtra("position", -1);
+            if (editedText != null && editedText.length() > 0 && !editedText.equals(editingItem)) {
+                items.set(position, editedText);
+                itemsAdapter.notifyDataSetChanged();
+            }
         }
     }
 }
